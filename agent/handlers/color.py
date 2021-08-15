@@ -1,8 +1,8 @@
 class Color:
     def __init__(self, r, g, b):
-        self.r = r
-        self.g = g
-        self.b = b
+        self.r = int(r)
+        self.g = int(g)
+        self.b = int(b)
         if r > 255 or r < 0:
             raise ValueError('Color value (red) must be in the range [0-255]')
         if g > 255 or g < 0:
@@ -21,3 +21,6 @@ class Color:
     
     def hex(self):
         return '#%02x%02x%02x' % (self.r, self.g, self.b)
+
+    def tostr(self):
+        return str(self.r) + "," + str(self.g) + "," + str(self.b)

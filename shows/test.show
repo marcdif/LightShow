@@ -1,13 +1,53 @@
+Show	Debug	false	# When show runs with debug set to true, useful info is printed...
 Show	Name	Testing show
 Show	Audio	music.mp3
-0	Log	This is test message 1
-1	Log	This is test message 2
-2	Log	This is test message 3
-3	Log	This is test message 4
-4	Log	This is test message 5
-5	Log	This is test message 6
-6	Log	This is test message 7
-7	Log	This is test message 8
-8	Log	This is test message 9
-9	Log	This is test message 10
-10	Log	All done!
+Show	Time	Seconds # or BPM to count in beats rather than seconds
+
+# Duration of beat = 60 / BPM
+# i.e. 60 / 120 = 0.5s per beat
+
+# BPMValues { -- Opening brace for all BPM values
+#	15.4	120	4	4
+#	|		|	|	|___ quarter note gets the beat
+#	|		|	|___ 4 beats per measure
+#	|		|___ 120 beats per minute
+#	|___ 15.4 seconds into the show
+#	87.2	 140 4	4 -- BPM change at 87.2
+# } -- Closing brace for all BPM values
+
+Show	BPMValues {
+	0	120	4	4
+	10	160	4	4
+}
+
+# ...such as at what beat count the BPM changes. i.e. if the BPM goes from 120 to 160 10 seconds in...
+# ...the first 12 beats will be at 120BPM, and 160BPM starts on the 13th beat.
+# Regardless of Debug mode, BPM changes throughout the show will always be printed to the console.
+
+#	[beat]	[action name]	[action data]
+#	15		Log				Text to be logged to console
+
+1	Log	This is on second 1
+1.5	Log	This is on second 1.5
+2	Log	This is on second 2
+3	Log	This is on second 3
+4	Log	This is on second 4
+5	Log	This is on second 5
+6	Log	This is on second 6
+7	Log	This is on second 7
+8	Log	This is on second 8
+9	Log	This is on second 9
+10	Log	This is on second 10
+11	Log	All done!
+
+2	FullLight	0	0	255
+2.1	FullLight	0	0	0
+2.2	FullLight	0	0	255
+2.3	FullLight	0	0	0
+2.4	FullLight	0	0	255
+2.5	FullLight	0	0	0
+2.6	FullLight	0	0	255
+2.7	FullLight	0	0	0
+2.8	FullLight	0	0	255
+2.9	FullLight	0	0	0
+3.0	FullLight	0	0	255

@@ -1,0 +1,15 @@
+# Show	Debug	true
+Show	Name	Test2
+Show	Audio	test2.mp3
+Show	Time	Seconds
+
+# 0	FullLight	0	0	255
+# 0.3	FullLight	255	0	0
+# 0.6	FullLight	0	0	255
+# 0.9	FullLight	255	0	0
+
+0	Log	Testing
+0	For	1000	0.66116	{
+	0	FullLight	0	0	255
+	0.33058	FullLight	255	0	0
+}
