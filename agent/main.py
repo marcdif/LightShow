@@ -85,7 +85,7 @@ try:
                         for_loop = For(t, int(tokens[2]), float(tokens[3]))
                         continue
                     elif act == 'FullLight':
-                        color = Color(int(tokens[2]), int(tokens[3]), int(tokens[4]))
+                        color = get_color(tokens[2])
                         nextaction = FullLight(t, color)
             elif first == '}': # End of a For loop
                 if for_loop_firstaction == None:
@@ -128,7 +128,10 @@ try:
                     nextaction.setnextact(temp)
                 size = size + 1
 
-    log("Finished loading " + str(size) + " actions... starting " + show + " show")
+    log("Finished loading " + str(size) + " actions...")
+
+    input("\nPress Enter to start the show...\n")
+    log("Starting " + show + "!")
 
     starttime = time.time()
 

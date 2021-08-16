@@ -9,7 +9,21 @@ Show	Time	Seconds
 # 0.9	FullLight	255	0	0
 
 0	Log	Testing
-0	For	1000	0.66116	{
+#0	FullLight	255	255	255
+0	FullLight	255	0	0
+0.33058	FullLight	0	0	255
+0.66116	FullLight	0	255	0
+
+#1.074385
+#1.15703
+#1.239675
+#1.32232
+
+0.99174	FullLight	255	255	255	
+1.074385	FullLight	255	0	0	
+1.15703	FullLight	255	255	255	
+1.239675	FullLight	255	0	0	
+1.32232	For	1000	0.66116	{	
 	0	FullLight	0	0	255
 	0.33058	FullLight	255	0	0
-}
+}					

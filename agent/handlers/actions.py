@@ -54,7 +54,7 @@ class Log(ShowAction):
             return
 
         # Print the text
-        print("Text: " + str(self.num) + " ", end='')
+        print("Text: ", end='')
         for i in range(self.num):
             print(self.text, end='')
 

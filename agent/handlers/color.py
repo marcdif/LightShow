@@ -1,8 +1,17 @@
+import webcolors
+
 class Color:
-    def __init__(self, r, g, b):
-        self.r = int(r)
-        self.g = int(g)
-        self.b = int(b)
+    def __init__(self, name: str):
+        if name.startswith('#'):
+            array = webcolors.hex_to_rgb(name)
+        else:
+            array = webcolors.name_to_rgb(name)
+        self.__init__(array[0], array[1], array[2])
+
+    def __init__(self, r: int, g: int, b: int):
+        self.r = r
+        self.g = g
+        self.b = b
         if r > 255 or r < 0:
             raise ValueError('Color value (red) must be in the range [0-255]')
         if g > 255 or g < 0:
