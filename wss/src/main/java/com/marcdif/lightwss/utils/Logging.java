@@ -14,8 +14,8 @@ public class Logging {
     public static void print(String prefix, String text, Throwable t) {
         if (prefix.trim().isEmpty()) prefix = "INFO";
         // [2021-08-15 21:42:03] [MainThread]: This is a message
-        System.out.println(FORMAT.format("[" + prefix + "]" + "[" + new Date()) + "] [" + Thread.currentThread().getName() + "]: " +
-                text + " (" + t.getMessage() + ")");
+        System.out.println("[" + FORMAT.format(new Date()) + "] [" + prefix + "] [" + Thread.currentThread().getName() + "]: " +
+                text + (t == null ? "" : " (" + t.getMessage() + ")"));
         if (t != null) t.printStackTrace(System.out);
     }
 

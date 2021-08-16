@@ -3,6 +3,8 @@ package com.marcdif.lightwss.server;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.marcdif.lightwss.packets.BasePacket;
+import com.marcdif.lightwss.packets.ConfirmSyncPacket;
+import com.marcdif.lightwss.packets.GetTimePacket;
 import com.marcdif.lightwss.utils.Logging;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -65,19 +67,46 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
                 object = (JsonObject) new JsonParser().parse(request);
             } catch (Exception e) {
                 Logging.warn("Error processing packet [" + request + "] from " +
-                        ((io.netty.channel.socket.SocketChannel) ctx).localAddress());
+                        ctx.channel().localAddress());
+                ctx.close();
                 return;
             }
             if (!object.has("id")) {
+                Logging.warn("Missing id field in packet [" + request + "] from " +
+                        ctx.channel().localAddress());
                 return;
             }
             int id = object.get("id").getAsInt();
-            if (id != 43) {
-                Logging.debug(object.toString());
-            }
+            Logging.debug(object.toString());
             ClientSocketChannel channel = (ClientSocketChannel) ctx.channel();
-//            switch (id) {
-//            }
+            if (channel.isSynchronizing() && (id > 2 || id < 1)) {
+                Logging.warn("Non-sync packet before synced from " +
+                        ctx.channel().localAddress());
+                return;
+            }
+
+            switch (id) {
+                case 1: {
+                    channel.send(new GetTimePacket(System.currentTimeMillis()));
+                    break;
+                }
+                case 2: {
+                    long serverTime = System.currentTimeMillis();
+                    ConfirmSyncPacket packet = new ConfirmSyncPacket(object);
+                    long difference = Math.abs(packet.getClientTime() - serverTime);
+                    if (difference <= 100) {
+                        Logging.print("Successfully synced client " + ctx.channel().localAddress()
+                                + " - " + channel.getConnectionID().toString());
+                        channel.setSynchronizing(false);
+                        channel.send(new ConfirmSyncPacket(0));
+                    } else {
+                        Logging.print("Failed to sync client " + ctx.channel().localAddress()
+                                + " - " + channel.getConnectionID().toString() + " - " + difference + "ms difference");
+                        channel.send(new ConfirmSyncPacket(-1));
+                    }
+                    break;
+                }
+            }
         } catch (Exception e) {
             Logging.error("Error processing incoming packet", e);
         }
