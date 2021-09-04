@@ -20,6 +20,7 @@ public class ClientSocketChannel extends NioSocketChannel {
     @Getter private final long connectTime = System.currentTimeMillis();
     @Getter @Setter private ConnectionType type = ConnectionType.UNKNOWN;
     @Getter @Setter private boolean synchronizing = true;
+    @Getter @Setter private String clientId;
 
     public ClientSocketChannel(SelectorProvider provider) {
         super(provider);

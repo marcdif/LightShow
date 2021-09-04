@@ -2,6 +2,7 @@ package com.marcdif.lightwss.server;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.marcdif.lightwss.Main;
 import com.marcdif.lightwss.packets.BasePacket;
 import com.marcdif.lightwss.packets.ConfirmSyncPacket;
 import com.marcdif.lightwss.packets.GetTimePacket;
@@ -77,28 +78,32 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
                 return;
             }
             int id = object.get("id").getAsInt();
-            Logging.debug(object.toString());
+            Logging.print(object.toString());
             ClientSocketChannel channel = (ClientSocketChannel) ctx.channel();
             if (channel.isSynchronizing() && (id > 2 || id < 1)) {
                 Logging.warn("Non-sync packet before synced from " +
                         ctx.channel().localAddress());
+                channel.send(new ConfirmSyncPacket(-1));
                 return;
             }
 
             switch (id) {
+                // Get Server Time
                 case 1: {
                     channel.send(new GetTimePacket(System.currentTimeMillis()));
                     break;
                 }
+                // Confirm Time Sync
                 case 2: {
                     long serverTime = System.currentTimeMillis();
                     ConfirmSyncPacket packet = new ConfirmSyncPacket(object);
                     long difference = Math.abs(packet.getClientTime() - serverTime);
                     if (difference <= 100) {
                         Logging.print("Successfully synced client " + ctx.channel().localAddress()
-                                + " - " + channel.getConnectionID().toString());
+                                + " (" + difference + "ms offset) - " + channel.getConnectionID().toString());
                         channel.setSynchronizing(false);
-                        channel.send(new ConfirmSyncPacket(0));
+                        channel.send(new ConfirmSyncPacket(difference));
+                        Main.sendSongStart(channel);
                     } else {
                         Logging.print("Failed to sync client " + ctx.channel().localAddress()
                                 + " - " + channel.getConnectionID().toString() + " - " + difference + "ms difference");

@@ -1,5 +1,9 @@
 package com.marcdif.lightwss;
 
+import com.marcdif.lightwss.packets.HeartbeatPacket;
+import com.marcdif.lightwss.packets.StartSongPacket;
+import com.marcdif.lightwss.server.ClientSocketChannel;
+import com.marcdif.lightwss.server.WebSocketServerHandler;
 import com.marcdif.lightwss.server.WebSocketServerInitializer;
 import com.marcdif.lightwss.server.WebSocketServerSocketChannel;
 import com.marcdif.lightwss.utils.Logging;
@@ -7,14 +11,42 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.net.InetSocketAddress;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Main {
     public static final String HOST = "0.0.0.0";
-    public static final int PORT = 3925;
+    public static final int PORT = 3926; // nginx listens on 3925, server on 3926
+
+    /**
+     * The name of the active song, or an empty string if nothing is playing.
+     */
+    @Getter @Setter public static String ACTIVE_SONG = "song.mp3";
+    /**
+     * The time the active song started in unix milliseconds, or 0 if nothing is playing.
+     */
+    @Getter @Setter public static long ACTIVE_SONG_START_TIME = System.currentTimeMillis();
+    /**
+     * The duration of the active song in milliseconds, or 0 if nothing is playing.
+     */
+    @Getter @Setter public static long ACTIVE_SONG_DURATION = 230000L;
 
     public static void main(String[] args) {
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                HeartbeatPacket pk = new HeartbeatPacket();
+                for (Channel ch : WebSocketServerHandler.getGroup()) {
+                    ((ClientSocketChannel) ch).send(pk);
+                }
+            }
+        };
+        new Timer("HeartbeatTimer").scheduleAtFixedRate(timerTask, 10000, 10000);
+
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
@@ -31,5 +63,16 @@ public class Main {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
         }
+    }
+
+    public static boolean hasActiveSong() {
+        // skip if no active song, or current song is over
+        return !ACTIVE_SONG.isEmpty() && (System.currentTimeMillis() - ACTIVE_SONG_START_TIME) < ACTIVE_SONG_DURATION;
+    }
+
+    public static void sendSongStart(ClientSocketChannel channel) {
+        if (!hasActiveSong()) return;
+        StartSongPacket packet = new StartSongPacket(ACTIVE_SONG, ACTIVE_SONG_START_TIME, ACTIVE_SONG_DURATION);
+        channel.send(packet);
     }
 }
