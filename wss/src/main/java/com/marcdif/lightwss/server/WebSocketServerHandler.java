@@ -126,7 +126,11 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        Logging.error("WebSocket exception", cause);
+        if (cause.getMessage().equals("Connection reset by peer")) {
+            Logging.warn("Client disconnected: " + ctx.channel().localAddress().toString());
+        } else {
+            Logging.error("WebSocket exception", null);
+        }
         ctx.close();
     }
 
