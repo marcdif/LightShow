@@ -6,7 +6,7 @@ from datetime import datetime
 def log(msg, time=None):
     if time == None:
         time = datetime.now()
-    print(time.strftime("%Y-%m-%d %H:%M:%S.%f") + ": " + msg)
+    print(time.strftime("%Y-%m-%d %H:%M:%S.%f") + ": " + msg, flush=True)
 
 # Check if string is number (float)
 def is_number(s: str):
