@@ -80,7 +80,7 @@ function socketServer() {
         p = (new Packets.GetTime()).fromObject(json);
         var received_time = Date.now();
         var difference = received_time - sync_start_local_time;
-        sync_server_time_offset = (p.serverTime - (difference / 2)) - sync_start_local_time;
+        sync_server_time_offset = sync_start_local_time - (p.serverTime - (difference / 2));
 
         log('p.serverTime: ' + p.serverTime);
         log('difference: ' + difference);
@@ -89,7 +89,7 @@ function socketServer() {
 
         log('Response took ' + difference + 'ms... setting sync_server_time_offset to ' + sync_server_time_offset);
 
-        var current_server_time = Date.now() + sync_server_time_offset;
+        var current_server_time = Date.now() - sync_server_time_offset;
 
         log('Responding with server time being ' + current_server_time);
         sync_start_local_time = 0;
