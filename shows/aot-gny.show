@@ -1,6 +1,6 @@
 # Show	Debug	true
 Show	Name	Test2
-Show	Audio	test2.mp3
+Show	Audio	test2.mp3 1500
 Show	Time	Seconds
 
 # 0	FullLight	0,0,255

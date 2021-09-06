@@ -1,6 +1,7 @@
 package com.marcdif.lightwss;
 
 import com.marcdif.lightwss.packets.HeartbeatPacket;
+import com.marcdif.lightwss.packets.StartShowPacket;
 import com.marcdif.lightwss.packets.StartSongPacket;
 import com.marcdif.lightwss.server.ClientSocketChannel;
 import com.marcdif.lightwss.server.WebSocketServerHandler;
@@ -25,15 +26,19 @@ public class Main {
     /**
      * The name of the active song, or an empty string if nothing is playing.
      */
-    @Getter @Setter public static String ACTIVE_SONG = "song.mp3";
+    @Getter @Setter public static String ACTIVE_SHOW = "";
+    /**
+     * The name of the active song, or an empty string if nothing is playing.
+     */
+    @Getter @Setter public static String ACTIVE_SONG = "";
     /**
      * The time the active song started in unix milliseconds, or 0 if nothing is playing.
      */
-    @Getter @Setter public static long ACTIVE_SONG_START_TIME = System.currentTimeMillis();
+    @Getter @Setter public static long ACTIVE_SONG_START_TIME = 0;
     /**
      * The duration of the active song in milliseconds, or 0 if nothing is playing.
      */
-    @Getter @Setter public static long ACTIVE_SONG_DURATION = 230000L;
+    @Getter @Setter public static long ACTIVE_SONG_DURATION = 0;
 
     public static void main(String[] args) {
         TimerTask timerTask = new TimerTask() {
@@ -72,7 +77,24 @@ public class Main {
 
     public static void sendSongStart(ClientSocketChannel channel) {
         if (!hasActiveSong()) return;
-        StartSongPacket packet = new StartSongPacket(ACTIVE_SONG, ACTIVE_SONG_START_TIME, ACTIVE_SONG_DURATION);
+        StartSongPacket packet = new StartSongPacket(ACTIVE_SONG, ACTIVE_SONG_START_TIME, ACTIVE_SONG_DURATION, ACTIVE_SHOW);
         channel.send(packet);
+    }
+
+    public static void processShowRequest(String showName) {
+        StartShowPacket packet = new StartShowPacket(showName);
+        for (Channel ch : WebSocketServerHandler.getGroup()) {
+            ((ClientSocketChannel) ch).send(packet);
+        }
+    }
+
+    public static void processShowStarting(StartSongPacket packet) {
+        ACTIVE_SHOW = packet.getShowName();
+        ACTIVE_SONG = packet.getSongPath();
+        ACTIVE_SONG_START_TIME = packet.getStartTime();
+        ACTIVE_SONG_DURATION = packet.getSongDuration();
+        for (Channel ch : WebSocketServerHandler.getGroup()) {
+            ((ClientSocketChannel) ch).send(packet);
+        }
     }
 }

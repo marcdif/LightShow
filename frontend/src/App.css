@@ -20,7 +20,7 @@
   flex-direction: column;
   align-items: center;
   /* justify-content: center; */
-  font-size: calc(10px + 2vmin);
+  font-size: calc(16px + 2vmin);
   color: white;
 }
 
@@ -29,7 +29,6 @@
 }
 
 .button {
-  background-color: #4CAF50;
   border: none;
   color: white;
   padding: 25px 50px;
@@ -42,6 +41,40 @@
   border-radius: 25px;
 }
 
+.red {
+  background-color: red;
+}
+
+.blue {
+  background-color: #222;
+  animation-name: flashBlue;
+  animation-duration: 0.5s;
+  animation-iteration-count: infinite;
+}
+
+.slowBlue {
+  background-color: #222;
+  animation-name: flashBlue;
+  animation-duration: 1.5s;
+  animation-iteration-count: infinite;
+}
+
+@keyframes flashBlue {
+  0% {
+    background-color: #4285f4;
+  }
+  50% {
+    background-color: #3064ba;
+  }
+  100% {
+    background-color: #4285f4;
+  }
+}
+
+.green {
+  background-color: #4CAF50;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
@@ -49,4 +82,51 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+table {
+  border-collapse: collapse;
+}
+
+[class*="table"] {
+  width: 100%;
+}
+
+@media only screen and (min-width: 1200px) {
+  .table {
+    width: 1200px;
+  }
+}
+
+th {
+  background-color: #0b0d0f;
+}
+
+th, td {
+  padding: 18px;
+}
+
+tr:nth-child(odd) {
+  background-color: #16191d;
+}
+
+tr:nth-child(even) {
+  background-color: #21262c;
+}
+
+.startButton {
+  border: none;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 38px;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 10px;
+  width: 100%;
+}
+
+.startButton.red {
+  cursor: not-allowed;
 }

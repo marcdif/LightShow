@@ -10,6 +10,17 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch via Yarn",
+            "runtimeExecutable": "yarn",
+            "cwd": "${workspaceFolder}/frontend",
+            "runtimeArgs": [
+                "start"
+            ],
+            "port": 5858
         }
     ]
 }

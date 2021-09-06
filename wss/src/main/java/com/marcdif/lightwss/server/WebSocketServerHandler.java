@@ -3,9 +3,7 @@ package com.marcdif.lightwss.server;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.marcdif.lightwss.Main;
-import com.marcdif.lightwss.packets.BasePacket;
-import com.marcdif.lightwss.packets.ConfirmSyncPacket;
-import com.marcdif.lightwss.packets.GetTimePacket;
+import com.marcdif.lightwss.packets.*;
 import com.marcdif.lightwss.utils.Logging;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -104,11 +102,30 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
                         channel.setSynchronizing(false);
                         channel.send(new ConfirmSyncPacket(difference));
                         Main.sendSongStart(channel);
+//                        new Timer().schedule(new TimerTask() {
+//                            @Override
+//                            public void run() {
+//                                StartShowPacket p = new StartShowPacket("gny");
+//                                channel.send(p);
+//                            }
+//                        }, 3000L);
                     } else {
                         Logging.print("Failed to sync client " + ctx.channel().localAddress()
                                 + " - " + channel.getConnectionID().toString() + " - " + difference + "ms difference");
                         channel.send(new ConfirmSyncPacket(-1));
                     }
+                    break;
+                }
+                // Instruction from Agent to Start Song
+                case 4: {
+                    StartSongPacket packet = new StartSongPacket(object);
+                    Main.processShowStarting(packet);
+                    break;
+                }
+                // Request to Start Show
+                case 6: {
+                    StartShowPacket packet = new StartShowPacket(object);
+                    Main.processShowRequest(packet.getShowName());
                     break;
                 }
             }

@@ -1,19 +1,26 @@
 from handlers.utils import *
 from handlers.actions import *
 from handlers.color import Color
+from argparse import ArgumentParser
 import time
 
 try: 
     Debug = False
     DebugV = False
     TempValues = False
-    show = "shows/gny"
+    showPrefix = "../shows/"
 
     ShowName = "Unknown"
     ShowAudio = "Unknown"
     ShowTime = "Seconds"
     firstaction = None
     size = 0
+
+    parser = ArgumentParser()
+    parser.add_argument("-s", dest="show", help="The show name to run", required=True)
+
+    args = parser.parse_args()
+    show = showPrefix + args.show
 
     # Whether to load temporary values in the show (skips reading from file)
     if TempValues:
@@ -42,7 +49,7 @@ try:
             size = size + 1
     else:
         # Read from file
-        log("Loading actions for " + show + " show...")
+        if Debug: log("Loading actions for " + show + " show...")
         with open(show + ".show") as f:
             lines = f.readlines()
         lines = [x.rstrip() for x in lines]
@@ -128,10 +135,13 @@ try:
                     nextaction.setnextact(temp)
                 size = size + 1
 
-    log("Finished loading " + str(size) + " actions...")
+    if Debug: log("Finished loading " + str(size) + " actions...")
+
+    print("Audio: " + ShowAudio, flush=True)
 
     input("\nPress Enter to start the show...\n")
-    log("Starting " + show + "!")
+    if Debug: log("Starting " + show + "!")
+    print("Starting show", flush=True)
 
     starttime = time.time()
 
@@ -201,7 +211,8 @@ try:
         continue
     
     set_full_strip(Color(0, 0, 0))
-    log(show + " has finished! " + str(time.time() - starttime))
+    print("Show ended", flush=True)
+    if Debug: log(show + " has finished! " + str(time.time() - starttime))
 
 except KeyboardInterrupt:
     log("Exiting...")

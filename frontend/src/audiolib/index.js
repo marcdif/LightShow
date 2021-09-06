@@ -1,3 +1,5 @@
+import log from '../utils'
+
 export default class AudioManager {
   constructor() {
     this.tracks = new Map();
@@ -25,13 +27,27 @@ export default class AudioManager {
         log("Starting " + howLate + "ms late...")
         if (howLate > songDuration) {
           // song is already over
-          log('Song was over before we started playing.');
+          log('[ERROR] Song was over before we started playing.');
           return;
         }
-        this.audio.play();
+        try {
+          this.audio.play();
+        } catch (e) {
+          log("Failed to start song! Maybe it doesn't exist?")
+          this.audio = null
+          this.stopSong()
+          return
+        }
         this.audio.currentTime = (howLate / 1000);
       } else {
-        this.audio.play();
+        try {
+          this.audio.play();
+        } catch (e) {
+          log("Failed to start song! Maybe it doesn't exist?")
+          this.audio = null
+          this.stopSong()
+          return
+        }
       }
       this.tracks.set(songPath, this.audio);
       let h = this;
@@ -46,10 +62,4 @@ export default class AudioManager {
       this.audio.pause();
     }
   }
-}
-
-function log(msg) {
-  var m = new Date();
-  var dateString = m.getUTCFullYear() + "/" + (m.getUTCMonth() + 1) + "/" + m.getUTCDate() + " " + String(m.getUTCHours()).padStart(2, '0') + ":" + String(m.getUTCMinutes()).padStart(2, '0') + ":" + String(m.getUTCSeconds()).padStart(2, '0') + "." + String(m.getUTCMilliseconds()).padStart(3, '0');
-  console.log(dateString + " | " + msg);
 }
