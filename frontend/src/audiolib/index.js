@@ -40,6 +40,7 @@ export default class AudioManager {
         }
         this.audio.currentTime = (howLate / 1000);
       } else {
+        log("Starting music!")
         try {
           this.audio.play();
         } catch (e) {

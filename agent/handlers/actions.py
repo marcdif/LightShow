@@ -1,5 +1,6 @@
 import time
 from handlers.lightstrip import *
+from handlers.utils import *
 
 class ShowAction:
     def __init__(self, time, nextact=None):
@@ -192,3 +193,36 @@ class FullLight(ShowAction):
 
     def tostr(self=None):
         return self.actiontype() + "-" + str(self.time) + "-" + self.color.tostr()
+
+class FadeTo(ShowAction):
+    def __init__(self, time, color, duration):
+        super().__init__(time)
+        self.color = color
+        self.duration = duration
+        self.done = False
+        self.firstrun = True
+    
+    def actiontype(self=None):
+        return 'FadeTo'
+
+    def color(self):
+        return self.color
+    
+    def run(self):
+        now = time.time()
+        if self.firstrun:
+            self.startTime = now
+            self.firstrun = False
+            self.starting = get_full_strip_color()
+            self.delta = color_delta(self.color, self.starting)
+        pct = (now - self.startTime) / self.duration
+        set_full_strip(color_add(self.starting, color_mult(self.delta, pct)))
+        if (now - self.startTime) >= self.duration:
+            self.done = True
+        return
+    
+    def isdone(self):
+        return self.done
+    
+    def tostr(self=None):
+        return self.actiontype() + "-" + str(self.time) + "-" + self.color.tostr() + "-" + str(self.duration)

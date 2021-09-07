@@ -12,12 +12,12 @@ class Color:
         self.r = r
         self.g = g
         self.b = b
-        if r > 255 or r < 0:
-            raise ValueError('Color value (red) must be in the range [0-255]')
-        if g > 255 or g < 0:
-            raise ValueError('Color value (green) must be in the range [0-255]')
-        if b > 255 or b < 0:
-            raise ValueError('Color value (blue) must be in the range [0-255]')
+        # if r > 255 or r < 0:
+        #     raise ValueError('Color value (red) must be in the range [0-255]: ' + str(r))
+        # if g > 255 or g < 0:
+        #     raise ValueError('Color value (green) must be in the range [0-255]: ' + str(g))
+        # if b > 255 or b < 0:
+        #     raise ValueError('Color value (blue) must be in the range [0-255]: ' + str(b))
     
     def r(self):
         return self.r

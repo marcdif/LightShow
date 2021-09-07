@@ -13,49 +13,53 @@ class ShowControl extends React.Component {
       expanded: false,
       shows: [
         {
-          'name': 'Glory -into the RM-',
-          'file': 'glory'
-        },
-        {
-          'name': 'Blu',
-          'file': 'blu'
-        },
-        {
-          'name': 'Warriors',
-          'file': 'warriors'
-        },
-        {
-          'name': 'Hopes and Dreams',
-          'file': 'undertale-had'
-        },
-        {
-          'name': 'Dark Crow',
-          'file': 'dark-crow'
-        },
-        {
-          'name': 'Its Raining Somewhere Else',
-          'file': 'undertale-raining'
-        },
-        {
-          'name': 'Undertale',
-          'file': 'undertale-title'
-        },
-        {
-          'name': 'REMEMBER',
-          'file': 'remember'
-        },
-        {
-          'name': 'Home',
-          'file': 'itsv-home'
-        },
-        {
-          'name': 'Merry-Go-Round',
-          'file': 'mha-mgr'
-        },
-        {
-          'name': 'Guren no Yumiya',
-          'file': 'aot-gny'
+          'name': 'Happily Ever After',
+          'file': 'hea'
         }
+        //   {
+        //     'name': 'Glory -into the RM-',
+        //     'file': 'glory'
+        //   },
+        //   {
+        //     'name': 'Blu',
+        //     'file': 'blu'
+        //   },
+        //   {
+        //     'name': 'Warriors',
+        //     'file': 'warriors'
+        //   },
+        //   {
+        //     'name': 'Hopes and Dreams',
+        //     'file': 'undertale-had'
+        //   },
+        //   {
+        //     'name': 'Dark Crow',
+        //     'file': 'dark-crow'
+        //   },
+        //   {
+        //     'name': 'Its Raining Somewhere Else',
+        //     'file': 'undertale-raining'
+        //   },
+        //   {
+        //     'name': 'Undertale',
+        //     'file': 'undertale-title'
+        //   },
+        //   {
+        //     'name': 'REMEMBER',
+        //     'file': 'remember'
+        //   },
+        //   {
+        //     'name': 'Home',
+        //     'file': 'itsv-home'
+        //   },
+        //   {
+        //     'name': 'Merry-Go-Round',
+        //     'file': 'mha-mgr'
+        //   },
+        //   {
+        //     'name': 'Guren no Yumiya',
+        //     'file': 'aot-gny'
+        //   }
       ],
       active_show: null
     }
@@ -65,7 +69,10 @@ class ShowControl extends React.Component {
     this.setState({
       expanded: !this.state.expanded
     })
-    return
+  }
+
+  stopShow = () => {
+    this.props.stopShow()
   }
 
   getKeys = () => {
@@ -97,7 +104,8 @@ class ShowControl extends React.Component {
     });
     return (
       <div>
-        <button className={classes} onClick={() => this.toggleMenu()}>Show Control</button><br />
+        <button className={classes} onClick={() => this.toggleMenu()}>Show Control</button>
+        <button className="button red" onClick={() => this.stopShow()}>Stop Show</button><br />
         {this.state.expanded ? (
           <table key={this.props.connected} className="table">
             <thead>

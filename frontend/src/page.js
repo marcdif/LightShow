@@ -22,7 +22,8 @@ class Page extends React.Component {
       synchronized: false,
       synchronizing: false,
       connecting: false,
-      displayText: 'Not Connected'
+      displayText: 'Not Connected',
+      lightServerConnected: false
     };
   }
 
@@ -39,14 +40,15 @@ class Page extends React.Component {
 
   connectToAudio() {
     log("Connecting...")
+    var clientId = this.makeid(16)
     this.setState({
       connecting: true,
       synchronized: false,
       synchronizing: false,
-      clientId: this.makeid(16),
+      clientId: clientId,
       displayText: "Connecting..."
     })
-    log("Using clientId " + this.state.clientId)
+    log("Using clientId " + clientId)
     let timer = setTimeout(() => this.socketServer(), 500)
     return () => {
       clearTimeout(timer)
@@ -78,7 +80,7 @@ class Page extends React.Component {
     this.ws.onclose = () => {
       log('disconnected');
       audioManager.stopSong();
-      this.setState({ synchronized: false, synchronizing: false, connecting: false })
+      this.setState({ synchronized: false, synchronizing: false, connecting: false, displayText: "Not Connected", lightServerConnected: false })
     }
 
     this.ws.onmessage = (data) => {
@@ -95,7 +97,7 @@ class Page extends React.Component {
           p = (new Packets.GetTime()).fromObject(json);
           var received_time = Date.now();
           var difference = received_time - this.state.sync_start_local_time;
-          this.setState({ sync_server_time_offset: this.state.sync_start_local_time - (p.serverTime - (difference / 2)) })
+          this.setState({ sync_server_time_offset: (this.state.sync_start_local_time - (p.serverTime - (difference / 2))) * -1 })
 
           log('p.serverTime: ' + p.serverTime);
           log('difference: ' + difference);
@@ -104,7 +106,7 @@ class Page extends React.Component {
 
           log('Response took ' + difference + 'ms... setting sync_server_time_offset to ' + this.state.sync_server_time_offset);
 
-          var current_server_time = Date.now() - this.state.sync_server_time_offset;
+          var current_server_time = Date.now() + this.state.sync_server_time_offset;
 
           log('Responding with server time being ' + current_server_time);
           this.setState({ sync_start_local_time: 0 })
@@ -121,6 +123,8 @@ class Page extends React.Component {
           if (p.clientTime >= 0) {
             // accepted
             log('[INFO] Sync succeeded! ' + p.clientTime + 'ms offset');
+            p = (new Packets.ClientConnect()).set(this.state.clientId);
+            this.ws.send(p.asJSON());
             this.setState({
               synchronizing: false,
               sync_start_local_time: 0,
@@ -150,12 +154,21 @@ class Page extends React.Component {
           this.setState({
             displayText: "Now Playing: " + p.showName
           });
-        } else if (json.id === PacketID.STOP_SONG) {
+        } else if (json.id === PacketID.STOP_SONG || json.id === PacketID.STOP_SHOW) {
           if (!this.state.synchronized) {
             log("[ERROR] Can't stop a song, we aren't synchronized!");
             return;
           }
           audioManager.stopSong();
+          this.setState({
+            displayText: "Now Playing: No Show"
+          });
+        } else if (json.id === PacketID.SERVER_STATUS) {
+          p = (new Packets.ServerStatus()).fromObject(json);
+          log('[INFO] Light Server Status Update, connected: ' + p.lightServerConnected);
+          this.setState({
+            lightServerConnected: p.lightServerConnected
+          });
         }
       } catch (a) {
         this.ws.close();
@@ -174,6 +187,16 @@ class Page extends React.Component {
     this.ws.send(p.asJSON())
   }
 
+  stopShow = () => {
+    if (this.ws == null) {
+      log("WebSocket isn't connected - can't stop show!")
+      return;
+    }
+    log("Stopping show!")
+    var p = (new Packets.StopShow())
+    this.ws.send(p.asJSON())
+  }
+
   render() {
     var classes = classNames({
       'button': true,
@@ -186,8 +209,9 @@ class Page extends React.Component {
         <h1>LightShow Control Panel</h1>
         <div className="buttons">
           <h3>{this.state.displayText}</h3>
+          <h3>Light Server: {this.state.lightServerConnected ? "Connected" : "Disconnected"}</h3>
           <button className={classes} onClick={() => this.connectToAudio()}>Listen to the Music</button><br />
-          <ShowControl startShow={this.startShow} connected={this.state.synchronized} />
+          <ShowControl startShow={this.startShow} stopShow={this.stopShow} connected={this.state.synchronized} />
         </div>
       </div>
     );
@@ -201,7 +225,9 @@ var PacketID = {
   CLIENT_CONNECT: 3,
   START_SONG: 4,
   STOP_SONG: 5,
-  START_SHOW: 6
+  START_SHOW: 6,
+  STOP_SHOW: 7,
+  SERVER_STATUS: 8
 }
 var Packets = {};
 Packets.protocolVersion = 8;
@@ -256,18 +282,22 @@ Packets.ConfirmSync = function () {
 }
 Packets.ClientConnect = function () {
   this.clientId = '';
+  this.connectionType = '';
   this.set = function (t) {
     this.clientId = t;
+    this.connectionType = 'WEBCLIENT';
     return this;
   };
   this.fromObject = function (e) {
     this.clientId = e.clientId;
+    this.connectionType = e.connectionType;
     return this;
   };
   this.asJSON = function () {
     return JSON.stringify({
       id: PacketID.CLIENT_CONNECT,
-      clientId: this.clientId
+      clientId: this.clientId,
+      connectionType: this.connectionType
     })
   };
 };
@@ -314,6 +344,36 @@ Packets.StartShow = function () {
     return JSON.stringify({
       id: PacketID.START_SHOW,
       showName: this.showName
+    })
+  }
+};
+Packets.StopShow = function () {
+  this.set = function (e) {
+    return this;
+  };
+  this.fromObject = function (e) {
+    return this;
+  };
+  this.asJSON = function () {
+    return JSON.stringify({
+      id: PacketID.STOP_SHOW,
+    })
+  }
+};
+Packets.ServerStatus = function () {
+  this.lightServerConnected = '';
+  this.set = function (e) {
+    this.lightServerConnected = e;
+    return this;
+  };
+  this.fromObject = function (e) {
+    this.lightServerConnected = e.lightServerConnected;
+    return this;
+  };
+  this.asJSON = function () {
+    return JSON.stringify({
+      id: PacketID.SERVER_STATUS,
+      lightServerConnected: this.lightServerConnected
     })
   }
 };

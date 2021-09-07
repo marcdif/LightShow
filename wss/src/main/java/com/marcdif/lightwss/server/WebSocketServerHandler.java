@@ -3,6 +3,7 @@ package com.marcdif.lightwss.server;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.marcdif.lightwss.Main;
+import com.marcdif.lightwss.handlers.ConnectionType;
 import com.marcdif.lightwss.packets.*;
 import com.marcdif.lightwss.utils.Logging;
 import io.netty.channel.ChannelHandlerContext;
@@ -116,10 +117,29 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
                     }
                     break;
                 }
+                // Client Connect
+                case 3: {
+                    ClientConnectPacket packet = new ClientConnectPacket(object);
+                    channel.setClientId(packet.getClientId());
+                    channel.setType(packet.getConnectionType());
+                    if (channel.getType().equals(ConnectionType.WEBCLIENT)) {
+                        channel.send(new ServerStatusPacket(Main.isLightServerConnected()));
+                    } else if (channel.getType().equals(ConnectionType.LIGHTSERVER)) {
+                        Main.sendTo(new ServerStatusPacket(true), ConnectionType.WEBCLIENT);
+                    }
+                    break;
+                }
                 // Instruction from Agent to Start Song
                 case 4: {
                     StartSongPacket packet = new StartSongPacket(object);
                     Main.processShowStarting(packet);
+                    break;
+                }
+                // Instruction from Agent to Stop Song
+                case 5:
+                    // Request to Stop Show
+                case 7: {
+                    Main.stopShow();
                     break;
                 }
                 // Request to Start Show
@@ -136,9 +156,14 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        super.channelActive(ctx);
-        ClientSocketChannel dash = (ClientSocketChannel) ctx.channel();
         // when client disconnects
+        super.channelActive(ctx);
+        ClientSocketChannel client = (ClientSocketChannel) ctx.channel();
+        if (client.getType().equals(ConnectionType.LIGHTSERVER)) {
+            if (!Main.isLightServerConnected()) {
+                Main.sendTo(new ServerStatusPacket(false), ConnectionType.WEBCLIENT);
+            }
+        }
     }
 
     @Override
@@ -159,17 +184,6 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
                 handleWebSocketFrame(ctx, (WebSocketFrame) msg);
             } catch (Exception e) {
                 Logging.error("Error reading websocket channel", e);
-            }
-        }
-    }
-
-    private void sendAll(BasePacket packet) {
-        for (Object o : WebSocketServerHandler.getGroup()) {
-            ClientSocketChannel dash = (ClientSocketChannel) o;
-            try {
-                dash.send(packet);
-            } catch (Exception e) {
-                Logging.error("Error sending packet", e);
             }
         }
     }

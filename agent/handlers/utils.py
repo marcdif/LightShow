@@ -33,3 +33,15 @@ def get_color(text: str) -> Color:
         return Color(r, g, b)
     else:
         return Color(text)
+
+def color_delta(final: Color, initial: Color) -> Color:
+    return Color(final.r - initial.r, final.g - initial.g, final.b - initial.b)
+
+def color_add(color: Color, amount: int) -> Color:
+    return Color(color.r + amount, color.g + amount, color.b + amount)
+
+def color_add(color: Color, amount: Color) -> Color:
+    return Color(color.r + amount.r, color.g + amount.g, color.b + amount.b)
+
+def color_mult(color: Color, amount: float) -> Color:
+    return Color(round(color.r * amount), round(color.g * amount), round(color.b * amount))

@@ -1,3 +1,5 @@
+from handlers.color import Color
+
 try:
     rpi_led_module = __import__("rpi_ws281x")
 except ImportError:
@@ -15,6 +17,8 @@ LED_BRIGHTNESS = 255  # Set to 0 for darkest and 255 for brightest
 LED_INVERT = False    # True to invert the signal (when using NPN transistor level shift)
 LED_CHANNEL = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 
+pixels = [None] * LED_COUNT
+
 if rpi_led_module != None:
     strip = rpi_led_module.PixelStrip(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
     strip.begin()
@@ -28,15 +32,33 @@ def _to_native_color(color):
     else:
         return color
 
+def _to_general_color(color):
+    if rpi_led_module != None:
+        return Color(color.r, color.g, color.b)
+    else:
+        return color
+
 def set_full_strip(color):
     _local_log("Set full strip to " + color.tostr())
     if rpi_led_module != None:
         for i in range(strip.numPixels()):
             strip.setPixelColor(i, _to_native_color(color))
         strip.show()
+    else:
+        for i in range(LED_COUNT):
+            pixels[i] = color
 
 def set_single_led(id, color):
     _local_log("Set LED #" + str(id) + " to " + color.tostr())
     if rpi_led_module != None:
         strip.setPixelColor(id, _to_native_color(color))
         strip.show()
+    else:
+        pixels[id] = color
+
+# This method assumes the full strip is the same color!
+def get_full_strip_color():
+    if rpi_led_module != None:
+        return _to_general_color(strip.getPixelColorRGB(0))
+    else:
+        return pixels[0]

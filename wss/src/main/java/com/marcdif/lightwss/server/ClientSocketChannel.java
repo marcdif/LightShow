@@ -18,6 +18,7 @@ public class ClientSocketChannel extends NioSocketChannel {
     @Getter protected long id = nextId.getAndIncrement();
     @Getter private final UUID connectionID = UUID.randomUUID();
     @Getter private final long connectTime = System.currentTimeMillis();
+
     @Getter @Setter private ConnectionType type = ConnectionType.UNKNOWN;
     @Getter @Setter private boolean synchronizing = true;
     @Getter @Setter private String clientId;

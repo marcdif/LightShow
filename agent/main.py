@@ -8,7 +8,6 @@ try:
     Debug = False
     DebugV = False
     TempValues = False
-    showPrefix = "../shows/"
 
     ShowName = "Unknown"
     ShowAudio = "Unknown"
@@ -18,9 +17,11 @@ try:
 
     parser = ArgumentParser()
     parser.add_argument("-s", dest="show", help="The show name to run", required=True)
+    parser.add_argument("-p", dest="homePath", help="The home path to navigate directories from", required=False, default=".")
 
     args = parser.parse_args()
-    show = showPrefix + args.show
+    homePath = args.homePath
+    show = homePath + "/shows/" + args.show
 
     # Whether to load temporary values in the show (skips reading from file)
     if TempValues:
@@ -94,6 +95,10 @@ try:
                     elif act == 'FullLight':
                         color = get_color(tokens[2])
                         nextaction = FullLight(t, color)
+                    elif act == 'FadeTo':
+                        color = get_color(tokens[2])
+                        duration = float(tokens[3])
+                        nextaction = FadeTo(t, color, duration)
             elif first == '}': # End of a For loop
                 if for_loop_firstaction == None:
                     raise SyntaxError("For loop must have at least 1 action!")

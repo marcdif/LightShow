@@ -1,8 +1,7 @@
 package com.marcdif.lightwss;
 
-import com.marcdif.lightwss.packets.HeartbeatPacket;
-import com.marcdif.lightwss.packets.StartShowPacket;
-import com.marcdif.lightwss.packets.StartSongPacket;
+import com.marcdif.lightwss.handlers.ConnectionType;
+import com.marcdif.lightwss.packets.*;
 import com.marcdif.lightwss.server.ClientSocketChannel;
 import com.marcdif.lightwss.server.WebSocketServerHandler;
 import com.marcdif.lightwss.server.WebSocketServerInitializer;
@@ -83,9 +82,7 @@ public class Main {
 
     public static void processShowRequest(String showName) {
         StartShowPacket packet = new StartShowPacket(showName);
-        for (Channel ch : WebSocketServerHandler.getGroup()) {
-            ((ClientSocketChannel) ch).send(packet);
-        }
+        sendTo(packet, ConnectionType.LIGHTSERVER);
     }
 
     public static void processShowStarting(StartSongPacket packet) {
@@ -93,8 +90,39 @@ public class Main {
         ACTIVE_SONG = packet.getSongPath();
         ACTIVE_SONG_START_TIME = packet.getStartTime();
         ACTIVE_SONG_DURATION = packet.getSongDuration();
+        sendTo(packet, ConnectionType.WEBCLIENT);
+    }
+
+    public static void stopShow() {
+        ACTIVE_SHOW = "";
+        ACTIVE_SONG = "";
+        ACTIVE_SONG_START_TIME = 0;
+        ACTIVE_SONG_DURATION = 0;
+        sendTo(new StopSongPacket(), ConnectionType.WEBCLIENT);
+        sendTo(new StopShowPacket(), ConnectionType.LIGHTSERVER);
+    }
+
+    public static void sendTo(BasePacket packet, ConnectionType... types) {
         for (Channel ch : WebSocketServerHandler.getGroup()) {
-            ((ClientSocketChannel) ch).send(packet);
+            ClientSocketChannel client = (ClientSocketChannel) ch;
+            for (ConnectionType t : types) {
+                if (client.getType().equals(t)) {
+                    try {
+                        client.send(packet);
+                    } catch (Exception e) {
+                        Logging.error("Error sending packet", e);
+                    }
+                    break;
+                }
+            }
         }
+    }
+
+    public static boolean isLightServerConnected() {
+        for (Channel ch : WebSocketServerHandler.getGroup()) {
+            ClientSocketChannel client = (ClientSocketChannel) ch;
+            if (client.getType().equals(ConnectionType.LIGHTSERVER)) return true;
+        }
+        return false;
     }
 }
