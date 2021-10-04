@@ -1,14 +1,15 @@
-package com.marcdif.lightagent;
+package com.marcdif.lightagent.wss;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.marcdif.lightagent.Main;
 import com.marcdif.lightagent.handlers.ConnectionType;
-import com.marcdif.lightagent.packets.*;
+import com.marcdif.lightagent.wss.packets.*;
+import lombok.Getter;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_6455;
 import org.java_websocket.handshake.ServerHandshake;
 
-import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Random;
@@ -23,14 +24,14 @@ public class LightWSSConnection {
     private WebSocketClient ws;
     private boolean synchronizing = false;
     private long syncStartLocalTime = 0;
-    private long syncServerTimeOffset = 0;
+    @Getter private long syncServerTimeOffset = 0;
     private boolean syncDone = false;
     private int syncAttempts = 0;
 
-    private Thread agentThread;
-    private long showStartTime = 0;
-    private String showName = "";
-    private boolean showRunning = false;
+    //    private Thread agentThread;
+//    private long showStartTime = 0;
+//    private String showName = "";
+//    private boolean showRunning = false;
 
     public LightWSSConnection() {
         start();
@@ -131,16 +132,17 @@ public class LightWSSConnection {
                             }
                             StartShowPacket packet = new StartShowPacket(object);
 
-                            Main.logMessage("[INFO] Received request to start " + packet.getShowName() + " - starting in 2 seconds...");
-                            showStartTime = (System.currentTimeMillis() + 2000) - syncServerTimeOffset;
-                            showName = packet.getShowName();
+                            Main.getShowManager().startShow(packet.getShowName());
 
-                            if (agentThread != null && agentThread.isAlive()) {
-                                //noinspection deprecation
-                                agentThread.stop();
-                                agentThread = null;
-                            }
-                            startAgent();
+//                            showStartTime = (System.currentTimeMillis() + 2000) - syncServerTimeOffset;
+//                            showName = packet.getShowName();
+
+//                            if (agentThread != null && agentThread.isAlive()) {
+//                                //noinspection deprecation
+//                                agentThread.stop();
+//                                agentThread = null;
+//                            }
+//                            startAgent();
                             break;
                         }
                         case 7: {
@@ -148,16 +150,13 @@ public class LightWSSConnection {
                                 Main.logMessage("[ERROR] Can't stop a show, we aren't synchronized!");
                                 return;
                             }
-                            Main.logMessage("[INFO] Received request to stop the running show!");
-                            showStartTime = 0;
-                            showName = "";
-                            showRunning = false;
-                            if (agentThread != null && agentThread.isAlive()) {
-//                                //noinspection deprecation
-//                                agentThread.stop();
-//                                agentThread = null;
-                                Main.logMessage("[INFO] Stopped show!");
-                            }
+                            Main.getShowManager().stopShow();
+//                            if (agentThread != null && agentThread.isAlive()) {
+////                                //noinspection deprecation
+////                                agentThread.stop();
+////                                agentThread = null;
+//                                Main.logMessage("[INFO] Stopped show!");
+//                            }
                             break;
                         }
                     }
@@ -221,93 +220,93 @@ public class LightWSSConnection {
         send(packet.getJSON().toString());
     }
 
-    public void startAgent() {
-        agentThread = new Thread(() -> {
-            Main.logMessage("[AgentThread] [INFO] Starting python agent...");
-            long threadStart = System.currentTimeMillis();
-            try {
-                File showFile = new File(Main.HOME_PATH + "/shows/" + showName + ".show");
-                if (!showFile.exists()) {
-                    Main.logMessage("[AgentThread] [ERROR] Show file doesn't exist - exiting AgentThread!");
-                    return;
-                }
-                String cmd = "" + Main.HOME_PATH + "/agent/.venv/bin/python -i " + Main.HOME_PATH + "/agent/main.py -s " + showName + " -p " + Main.HOME_PATH;
-                Main.logMessage("[AgentThread] [DEBUG] Executing \"" + cmd + "\"");
-                Process process = Runtime.getRuntime().exec(cmd);
-                showRunning = true;
-                boolean showReallyRunning = false;
-
-                BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
-
-                while (true) {
-                    if (!showReallyRunning) {
-                        String output = in.readLine();
-                        if (output != null) {
-                            System.out.println("value is : " + output);
-                            if (output.startsWith("Audio: ")) {
-                                String[] audio = output.split(" ");
-                                if (!audio[1].equals("Unknown")) {
-                                    String songPath = audio[1];
-                                    int duration = Integer.parseInt(audio[2]) * 1000;
-                                    StartSongPacket startSongPacket = new StartSongPacket(songPath, showStartTime, duration, showName);
-                                    Main.logMessage("[AgentThread] [INFO] Sending out StartSongPacket to start " + audio[1] + " (duration: " + duration + "s) in " + ((showStartTime - System.currentTimeMillis()) / 1000D) + " seconds");
-                                    LightWSSConnection.this.send(startSongPacket);
-                                }
-                            } else if (output.startsWith("Press Enter to start the show...")) {
-                                try {
-                                    //noinspection BusyWait
-                                    Thread.sleep((showStartTime + syncServerTimeOffset) - System.currentTimeMillis());
-                                    System.out.println("Starting show...");
-                                    writer.write("\n");
-                                    writer.flush();
-                                    System.out.println("Started show!");
-                                    showReallyRunning = true;
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        } else {
-                            System.out.println("output null");
-                        }
-                    }
-                    if (!process.isAlive()) {
-                        showRunning = false;
-                    }
-                    if (!showRunning) {
-                        try {
-                            System.out.println("Stopping show... " + process.pid());
-                            process.children().forEach(p -> {
-                                try {
-                                    Runtime.getRuntime().exec("kill -2 " + p.pid());
-                                    p.destroy();
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            });
-                            Runtime.getRuntime().exec("kill -2 " + process.pid());
-                            process.destroy();
-                            System.out.println("Stopped show! Running clear file...");
-                            String cmd2 = "" + Main.HOME_PATH + "/agent/.venv/bin/python " + Main.HOME_PATH + "/agent/clear.py";
-                            Main.logMessage("[AgentThread] [DEBUG] Executing \"" + cmd2 + "\"");
-                            Runtime.getRuntime().exec(cmd2);
-                            StopSongPacket stopSongPacket = new StopSongPacket();
-                            Main.logMessage("[AgentThread] [INFO] Show has ended, sending out StopSongPacket");
-                            LightWSSConnection.this.send(stopSongPacket);
-                            return;
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        break;
-                    }
-                }
-                System.out.println("D");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-        agentThread.start();
-    }
+//    public void startAgent() {
+//        agentThread = new Thread(() -> {
+//            Main.logMessage("[AgentThread] [INFO] Starting python agent...");
+//            long threadStart = System.currentTimeMillis();
+//            try {
+//                File showFile = new File(Main.HOME_PATH + "/shows/" + showName + ".show");
+//                if (!showFile.exists()) {
+//                    Main.logMessage("[AgentThread] [ERROR] Show file doesn't exist - exiting AgentThread!");
+//                    return;
+//                }
+//                String cmd = "" + Main.HOME_PATH + "/agent/.venv/bin/python -i " + Main.HOME_PATH + "/agent/main.py -s " + showName + " -p " + Main.HOME_PATH;
+//                Main.logMessage("[AgentThread] [DEBUG] Executing \"" + cmd + "\"");
+//                Process process = Runtime.getRuntime().exec(cmd);
+//                showRunning = true;
+//                boolean showReallyRunning = false;
+//
+//                BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));
+//                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+//
+//                while (true) {
+//                    if (!showReallyRunning) {
+//                        String output = in.readLine();
+//                        if (output != null) {
+//                            System.out.println("value is : " + output);
+//                            if (output.startsWith("Audio: ")) {
+//                                String[] audio = output.split(" ");
+//                                if (!audio[1].equals("Unknown")) {
+//                                    String songPath = audio[1];
+//                                    int duration = Integer.parseInt(audio[2]) * 1000;
+//                                    StartSongPacket startSongPacket = new StartSongPacket(songPath, showStartTime, duration, showName);
+//                                    Main.logMessage("[AgentThread] [INFO] Sending out StartSongPacket to start " + audio[1] + " (duration: " + duration + "s) in " + ((showStartTime - System.currentTimeMillis()) / 1000D) + " seconds");
+//                                    LightWSSConnection.this.send(startSongPacket);
+//                                }
+//                            } else if (output.startsWith("Press Enter to start the show...")) {
+//                                try {
+//                                    //noinspection BusyWait
+//                                    Thread.sleep((showStartTime + syncServerTimeOffset) - System.currentTimeMillis());
+//                                    System.out.println("Starting show...");
+//                                    writer.write("\n");
+//                                    writer.flush();
+//                                    System.out.println("Started show!");
+//                                    showReallyRunning = true;
+//                                } catch (InterruptedException e) {
+//                                    e.printStackTrace();
+//                                }
+//                            }
+//                        } else {
+//                            System.out.println("output null");
+//                        }
+//                    }
+//                    if (!process.isAlive()) {
+//                        showRunning = false;
+//                    }
+//                    if (!showRunning) {
+//                        try {
+//                            System.out.println("Stopping show... " + process.pid());
+//                            process.children().forEach(p -> {
+//                                try {
+//                                    Runtime.getRuntime().exec("kill -2 " + p.pid());
+//                                    p.destroy();
+//                                } catch (Exception e) {
+//                                    e.printStackTrace();
+//                                }
+//                            });
+//                            Runtime.getRuntime().exec("kill -2 " + process.pid());
+//                            process.destroy();
+//                            System.out.println("Stopped show! Running clear file...");
+//                            String cmd2 = "" + Main.HOME_PATH + "/agent/.venv/bin/python " + Main.HOME_PATH + "/agent/clear.py";
+//                            Main.logMessage("[AgentThread] [DEBUG] Executing \"" + cmd2 + "\"");
+//                            Runtime.getRuntime().exec(cmd2);
+//                            StopSongPacket stopSongPacket = new StopSongPacket();
+//                            Main.logMessage("[AgentThread] [INFO] Show has ended, sending out StopSongPacket");
+//                            LightWSSConnection.this.send(stopSongPacket);
+//                            return;
+//                        } catch (Exception e) {
+//                            e.printStackTrace();
+//                        }
+//                        break;
+//                    }
+//                }
+//                System.out.println("D");
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        });
+//        agentThread.start();
+//    }
 
     public String getSaltString() {
         String SALTCHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

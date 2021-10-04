@@ -1,4 +1,4 @@
-package com.marcdif.lightagent.packets;
+package com.marcdif.lightagent.wss.packets;
 
 import com.google.gson.JsonObject;
 
