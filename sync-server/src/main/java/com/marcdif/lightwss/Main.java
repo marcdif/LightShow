@@ -23,7 +23,7 @@ public class Main {
     public static final int PORT = 3926; // nginx listens on 3925, server on 3926
 
     /**
-     * The name of the active song, or an empty string if nothing is playing.
+     * The name of the active show, or an empty string if nothing is playing.
      */
     @Getter @Setter public static String ACTIVE_SHOW = "";
     /**

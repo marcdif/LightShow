@@ -1,6 +1,8 @@
 Show	Name	Happily Ever After
 Show	Audio	hea.mp3 1105
 Show	Time	Seconds
+# Show	SetStage	c1,c2,c3,c4,last	(clockwise)
+Show	SetStage	16,33,62,78,107
 
 # 0	FullLight	0,0,255
 # 0.3	FullLight	255,0,0

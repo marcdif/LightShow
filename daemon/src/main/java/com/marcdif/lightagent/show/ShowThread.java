@@ -170,7 +170,6 @@ public class ShowThread extends Thread {
             startTimeSeconds = System.currentTimeMillis() / 1000.0;
 
             runningActions = new ArrayList<>();
-            int count = 0;
 
             nextAction = firstAction;
 
