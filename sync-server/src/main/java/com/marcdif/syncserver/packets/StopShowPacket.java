@@ -1,4 +1,4 @@
-package com.marcdif.lightwss.packets;
+package com.marcdif.syncserver.packets;
 
 import com.google.gson.JsonObject;
 

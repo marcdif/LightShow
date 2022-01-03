@@ -1,4 +1,4 @@
-package com.marcdif.lightwss.server;
+package com.marcdif.syncserver.server;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;

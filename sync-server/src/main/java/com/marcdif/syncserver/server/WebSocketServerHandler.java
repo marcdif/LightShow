@@ -1,11 +1,12 @@
-package com.marcdif.lightwss.server;
+package com.marcdif.syncserver.server;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.marcdif.lightwss.Main;
-import com.marcdif.lightwss.handlers.ConnectionType;
-import com.marcdif.lightwss.packets.*;
-import com.marcdif.lightwss.utils.Logging;
+import com.marcdif.syncserver.Main;
+import com.marcdif.syncserver.handlers.ConnectionType;
+import com.marcdif.syncserver.packets.*;
+import com.marcdif.syncserver.utils.Logging;
+
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.group.ChannelGroup;
@@ -176,7 +177,8 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
         ctx.close();
     }
 
-    protected void channelRead0(ChannelHandlerContext ctx, Object msg) {
+    @Override
+    protected void messageReceived(ChannelHandlerContext ctx, Object msg) {
         if (msg instanceof FullHttpRequest) {
             handleHttpRequest(ctx, (FullHttpRequest) msg);
         } else if (msg instanceof WebSocketFrame) {

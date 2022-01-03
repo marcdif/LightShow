@@ -1,4 +1,4 @@
-package com.marcdif.lightwss.utils;
+package com.marcdif.syncserver.utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

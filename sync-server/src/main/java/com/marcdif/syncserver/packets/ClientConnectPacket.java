@@ -1,7 +1,8 @@
-package com.marcdif.lightwss.packets;
+package com.marcdif.syncserver.packets;
 
 import com.google.gson.JsonObject;
-import com.marcdif.lightwss.handlers.ConnectionType;
+import com.marcdif.syncserver.handlers.ConnectionType;
+
 import lombok.Getter;
 
 public class ClientConnectPacket extends BasePacket {

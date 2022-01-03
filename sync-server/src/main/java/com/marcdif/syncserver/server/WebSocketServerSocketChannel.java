@@ -1,10 +1,11 @@
-package com.marcdif.lightwss.server;
+package com.marcdif.syncserver.server;
 
-import com.marcdif.lightwss.utils.Logging;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 import java.nio.channels.SocketChannel;
 import java.util.List;
+
+import com.marcdif.syncserver.utils.Logging;
 
 public class WebSocketServerSocketChannel extends NioServerSocketChannel {
 

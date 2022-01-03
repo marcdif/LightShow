@@ -1,4 +1,4 @@
-package com.marcdif.lightwss.handlers;
+package com.marcdif.syncserver.handlers;
 
 public enum ConnectionType {
     LIGHTSERVER, WEBCLIENT, UNKNOWN;

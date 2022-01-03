@@ -1,7 +1,5 @@
-package com.marcdif.lightwss.server;
+package com.marcdif.syncserver.server;
 
-import com.marcdif.lightwss.handlers.ConnectionType;
-import com.marcdif.lightwss.packets.BasePacket;
 import io.netty.channel.Channel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
@@ -12,6 +10,9 @@ import java.nio.channels.SocketChannel;
 import java.nio.channels.spi.SelectorProvider;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
+
+import com.marcdif.syncserver.handlers.ConnectionType;
+import com.marcdif.syncserver.packets.BasePacket;
 
 public class ClientSocketChannel extends NioSocketChannel {
     private static final AtomicLong nextId = new AtomicLong(0L);

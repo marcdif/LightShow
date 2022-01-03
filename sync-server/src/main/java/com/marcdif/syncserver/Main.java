@@ -1,12 +1,5 @@
-package com.marcdif.lightwss;
+package com.marcdif.syncserver;
 
-import com.marcdif.lightwss.handlers.ConnectionType;
-import com.marcdif.lightwss.packets.*;
-import com.marcdif.lightwss.server.ClientSocketChannel;
-import com.marcdif.lightwss.server.WebSocketServerHandler;
-import com.marcdif.lightwss.server.WebSocketServerInitializer;
-import com.marcdif.lightwss.server.WebSocketServerSocketChannel;
-import com.marcdif.lightwss.utils.Logging;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
@@ -17,6 +10,14 @@ import lombok.Setter;
 import java.net.InetSocketAddress;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import com.marcdif.syncserver.handlers.ConnectionType;
+import com.marcdif.syncserver.packets.*;
+import com.marcdif.syncserver.server.ClientSocketChannel;
+import com.marcdif.syncserver.server.WebSocketServerHandler;
+import com.marcdif.syncserver.server.WebSocketServerInitializer;
+import com.marcdif.syncserver.server.WebSocketServerSocketChannel;
+import com.marcdif.syncserver.utils.Logging;
 
 public class Main {
     public static final String HOST = "0.0.0.0";
