@@ -8,11 +8,11 @@ The LED Agent is a Java program that controls addressable [WS2812B](https://www.
 
 ## Frontend Interface
 
-The Frontend Interface is a React app to allow multiple local devices to start/stop shows and listen to the show music at the same time in (near) perfect synchronization.
+The Frontend Interface is a React app to allow multiple local devices to start/stop shows and listen to the show music at the same time in (near) perfect synchronization. It communicates with the LED Agent through the Sync Server.
 
 ## Sync Server
 
-The Sync Server is a Java WSS using Netty to facilitate communication between the Show Controller Daemon and multiple Frontend Interfaces.
+The Sync Server is a Java WSS using Netty to facilitate communication between the LED Agent and multiple Frontend Interfaces.
 
 ## Notes
 
