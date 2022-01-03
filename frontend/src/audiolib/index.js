@@ -30,6 +30,7 @@ export default class AudioManager {
           log('[ERROR] Song was over before we started playing.');
           return;
         }
+        log('[DEBUG] Starting audio...');
         try {
           this.audio.play();
         } catch (e) {
@@ -39,6 +40,7 @@ export default class AudioManager {
           return
         }
         this.audio.currentTime = (howLate / 1000);
+        log('[DEBUG] Audio started! Current time: ' + this.audio.currentTime);
       } else {
         log("Starting music!")
         try {
@@ -64,3 +66,8 @@ export default class AudioManager {
     }
   }
 }
+
+// packet start time: 1641410169330.0
+//        start time: 1641410169272.5  Wednesday, January 5, 2022 2:16:09.272 PM
+//      current time: 1641169757293.0  Sunday, January 2, 2022 7:29:17.293 PM
+//                        240411979.5
