@@ -1,0 +1,14 @@
+package com.marcdif.ledagent.handlers;
+
+public enum ConnectionType {
+    LIGHTSERVER, WEBCLIENT, UNKNOWN;
+
+    public static ConnectionType fromString(String s) {
+        for (ConnectionType type : ConnectionType.values()) {
+            if (type.name().equalsIgnoreCase(s)) {
+                return type;
+            }
+        }
+        return UNKNOWN;
+    }
+}
