@@ -1,6 +1,6 @@
 # LightShow
 
-A project to create a show controller system using RGB LED light strips controlled by a Raspberry Pi. The Pi acts as the show controller with the Java Show Controller Agent. Then, there is a frontend React app for playing/synchronizing music, and a Java WebSocket Server to enable communication between the Pi and all clients.
+A project to create a show controller system using RGB LED light strips controlled by a Raspberry Pi. The Pi acts as the show controller with the Java LED Agent. Then, there is a React Frontend Interface for playing/synchronizing music, and a Java "Sync Server" to enable communication between the Pi and all clients.
 
 ## LED Agent
 
