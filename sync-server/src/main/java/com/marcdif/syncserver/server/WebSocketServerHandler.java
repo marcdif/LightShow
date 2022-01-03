@@ -65,7 +65,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
             String request = ((TextWebSocketFrame) frame).text();
             JsonObject object;
             try {
-                object = (JsonObject) new JsonParser().parse(request);
+                object = (JsonObject) JsonParser.parseString(request);
             } catch (Exception e) {
                 Logging.warn("Error processing packet [" + request + "] from " +
                         ctx.channel().localAddress());
