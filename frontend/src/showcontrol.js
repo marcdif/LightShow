@@ -1,4 +1,5 @@
 import React from "react";
+import shows_list from './shows.json';
 
 var classNames = require('classnames')
 
@@ -11,56 +12,7 @@ class ShowControl extends React.Component {
 
     this.state = {
       expanded: false,
-      shows: [
-        {
-          'name': 'Happily Ever After',
-          'file': 'hea'
-        }
-        //   {
-        //     'name': 'Glory -into the RM-',
-        //     'file': 'glory'
-        //   },
-        //   {
-        //     'name': 'Blu',
-        //     'file': 'blu'
-        //   },
-        //   {
-        //     'name': 'Warriors',
-        //     'file': 'warriors'
-        //   },
-        //   {
-        //     'name': 'Hopes and Dreams',
-        //     'file': 'undertale-had'
-        //   },
-        //   {
-        //     'name': 'Dark Crow',
-        //     'file': 'dark-crow'
-        //   },
-        //   {
-        //     'name': 'Its Raining Somewhere Else',
-        //     'file': 'undertale-raining'
-        //   },
-        //   {
-        //     'name': 'Undertale',
-        //     'file': 'undertale-title'
-        //   },
-        //   {
-        //     'name': 'REMEMBER',
-        //     'file': 'remember'
-        //   },
-        //   {
-        //     'name': 'Home',
-        //     'file': 'itsv-home'
-        //   },
-        //   {
-        //     'name': 'Merry-Go-Round',
-        //     'file': 'mha-mgr'
-        //   },
-        //   {
-        //     'name': 'Guren no Yumiya',
-        //     'file': 'aot-gny'
-        //   }
-      ],
+      shows: shows_list,
       active_show: null
     }
   }
