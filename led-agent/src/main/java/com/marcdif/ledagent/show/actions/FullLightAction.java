@@ -19,11 +19,7 @@ public class FullLightAction extends ShowAction {
 
     @Override
     public String toString() {
-        return "FullLightAction{" +
-                "finalColor=" + finalColor +
-                ", time=" + time +
-                ", type=" + type +
-                ", done=" + done +
-                '}';
+        return "FullLightAction{" + "finalColor=" + finalColor + ", time=" + time + ", type=" + type + ", done=" + done
+                + '}';
     }
 }

@@ -21,13 +21,7 @@ public class ForAction extends ShowAction {
 
     @Override
     public String toString() {
-        return "ForAction{" +
-                "count=" + count +
-                ", delay=" + delay +
-                ", firstAction=" + firstAction +
-                ", time=" + time +
-                ", type=" + type +
-                ", done=" + done +
-                '}';
+        return "ForAction{" + "count=" + count + ", delay=" + delay + ", firstAction=" + firstAction + ", time=" + time
+                + ", type=" + type + ", done=" + done + '}';
     }
 }

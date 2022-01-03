@@ -16,11 +16,7 @@ public class LogAction extends ShowAction {
 
     @Override
     public String toString() {
-        return "LogAction{" +
-                "message='" + message + '\'' +
-                ", time=" + time +
-                ", type=" + type +
-                ", done=" + done +
-                '}';
+        return "LogAction{" + "message='" + message + '\'' + ", time=" + time + ", type=" + type + ", done=" + done
+                + '}';
     }
 }

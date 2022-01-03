@@ -20,7 +20,8 @@ public abstract class ShowAction {
     }
 
     public boolean run() {
-        if (done) return true;
+        if (done)
+            return true;
         run_impl();
         return done;
     }

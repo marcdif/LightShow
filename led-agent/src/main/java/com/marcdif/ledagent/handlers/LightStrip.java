@@ -22,7 +22,8 @@ public class LightStrip {
     private final long[] pixels = new long[LED_COUNT];
 
     public LightStrip() {
-        strip = new Ws281xLedStrip(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMZ, LED_BRIGHTNESS, LED_CHANNEL, LED_INVERT, LedStripType.WS2811_STRIP_GRB, true);
+        strip = new Ws281xLedStrip(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMZ, LED_BRIGHTNESS, LED_CHANNEL, LED_INVERT,
+                LedStripType.WS2811_STRIP_GRB, true);
     }
 
     public void render() {
@@ -32,7 +33,8 @@ public class LightStrip {
     public void setAll(Color color) {
         color = ColorUtil.verify(color);
 
-        if (ShowThread.DEBUG) Main.logMessage("[LIGHTS] Set all to " + color.getColorBits() + "!");
+        if (ShowThread.DEBUG)
+            Main.logMessage("[LIGHTS] Set all to " + color.getColorBits() + "!");
         strip.setStrip(color);
         Arrays.fill(pixels, color.getColorBits());
     }
@@ -40,7 +42,8 @@ public class LightStrip {
     public void setPixel(Color color, int pixel) {
         color = ColorUtil.verify(color);
 
-        if (ShowThread.DEBUG) Main.logMessage("[LIGHTS] Set ID:" + pixel + " to " + color.getColorBits() + "!");
+        if (ShowThread.DEBUG)
+            Main.logMessage("[LIGHTS] Set ID:" + pixel + " to " + color.getColorBits() + "!");
         strip.setPixel(pixel, color);
         pixels[pixel] = color.getColorBits();
     }
@@ -48,7 +51,8 @@ public class LightStrip {
     public void setPixels(Color color, int... pixel) {
         color = ColorUtil.verify(color);
 
-        if (ShowThread.DEBUG) Main.logMessage("[LIGHTS] Set pixels to " + color.getColorBits() + "!");
+        if (ShowThread.DEBUG)
+            Main.logMessage("[LIGHTS] Set pixels to " + color.getColorBits() + "!");
         for (int i : pixel) {
             setPixel(color, i);
         }

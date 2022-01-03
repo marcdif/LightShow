@@ -39,16 +39,8 @@ public class FadeToAction extends ShowAction {
 
     @Override
     public String toString() {
-        return "FadeToAction{" +
-                "color=" + color +
-                ", duration=" + duration +
-                ", firstRun=" + firstRun +
-                ", startTime=" + startTime +
-                ", starting=" + starting +
-                ", delta=" + delta +
-                ", time=" + time +
-                ", type=" + type +
-                ", done=" + done +
-                '}';
+        return "FadeToAction{" + "color=" + color + ", duration=" + duration + ", firstRun=" + firstRun + ", startTime="
+                + startTime + ", starting=" + starting + ", delta=" + delta + ", time=" + time + ", type=" + type
+                + ", done=" + done + '}';
     }
 }

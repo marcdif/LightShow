@@ -20,7 +20,9 @@ public class ShowManager {
         }
         this.showName = showName;
         this.showStartTime = (System.currentTimeMillis() + SHOW_START_OFFSET) - Main.getSyncServerTimeOffset();
-        Main.logMessage("[INFO] Setting start time for " + showName + " to " + this.showStartTime + " (currentTime: " + System.currentTimeMillis() + ", SHOW_START_OFFSET: " + SHOW_START_OFFSET + ", syncServerTimeOffset: " + Main.getSyncServerTimeOffset());
+        Main.logMessage("[INFO] Setting start time for " + showName + " to " + this.showStartTime + " (currentTime: "
+                + System.currentTimeMillis() + ", SHOW_START_OFFSET: " + SHOW_START_OFFSET + ", syncServerTimeOffset: "
+                + Main.getSyncServerTimeOffset());
 
         try {
             activeShowThread = new ShowThread(showName, showStartTime);
