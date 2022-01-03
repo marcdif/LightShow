@@ -114,7 +114,7 @@ public class LightWSSConnection {
                                 Main.logMessage("[ERROR] Can't start a song, we aren't synchronized!");
                                 return;
                             }
-                            StartSongPacket packet = new StartSongPacket(object);
+                            // StartSongPacket packet = new StartSongPacket(object);
                             // start the song :shrug:
                             break;
                         }
