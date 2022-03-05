@@ -19,3 +19,4 @@ Show	SetStage	16,33,62,78,107
 #2	FullLight	0,0,0
 3.2	FullLight	0,255,0
 3.21	FadeTo	0,0,0	1.24
+33.21	FadeTo	0,0,0	1.24

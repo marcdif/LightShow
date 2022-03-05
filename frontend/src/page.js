@@ -23,7 +23,10 @@ class Page extends React.Component {
       synchronizing: false,
       connecting: false,
       displayText: 'Not Connected',
-      lightServerConnected: false
+      activeShowName: 'None',
+      syncServerConnected: false,
+      lightServerConnected: false,
+      showAutoPlayButton: false
     };
   }
 
@@ -46,7 +49,8 @@ class Page extends React.Component {
       synchronized: false,
       synchronizing: false,
       clientId: clientId,
-      displayText: "Connecting..."
+      displayText: "Connecting...",
+      syncServerConnected: false
     })
     log("Using clientId " + clientId)
     let timer = setTimeout(() => this.socketServer(), 500)
@@ -74,13 +78,13 @@ class Page extends React.Component {
       var GetTime = new Packets.GetTime();
       log('Sending this packet: ' + GetTime.asJSON());
       this.ws.send(GetTime.asJSON());
-      this.setState({ sync_start_local_time: Date.now() })
+      this.setState({ sync_start_local_time: Date.now(), syncServerConnected: true })
     };
 
     this.ws.onclose = () => {
       log('disconnected');
       audioManager.stopSong();
-      this.setState({ synchronized: false, synchronizing: false, connecting: false, displayText: "Not Connected", lightServerConnected: false })
+      this.setState({ synchronized: false, synchronizing: false, connecting: false, displayText: "Not Connected", activeShowName: "None", syncServerConnected: false, lightServerConnected: false })
     }
 
     this.ws.onmessage = (data) => {
@@ -150,9 +154,10 @@ class Page extends React.Component {
             return;
           }
           p = (new Packets.StartSong()).fromObject(json);
-          audioManager.startSong(p.songPath, p.startTime - this.state.sync_server_time_offset, p.songDuration);
+          audioManager.startSong(p.songPath, p.startTime - this.state.sync_server_time_offset, p.songDuration, this.showAutoPlayButton.bind(this), this.state.sync_server_time_offset);
           this.setState({
-            displayText: "Now Playing: " + p.showName
+            displayText: "Now Playing: " + p.showName,
+            activeShowName: p.showName
           });
         } else if (json.id === PacketID.STOP_SONG || json.id === PacketID.STOP_SHOW) {
           if (!this.state.synchronized) {
@@ -161,7 +166,8 @@ class Page extends React.Component {
           }
           audioManager.stopSong();
           this.setState({
-            displayText: "Now Playing: No Show"
+            displayText: "Now Playing: No Show",
+            activeShowName: 'None'
           });
         } else if (json.id === PacketID.SERVER_STATUS) {
           p = (new Packets.ServerStatus()).fromObject(json);
@@ -197,20 +203,51 @@ class Page extends React.Component {
     this.ws.send(p.asJSON())
   }
 
+  hideAutoPlayButton = () => {
+    this.setState({ showAutoPlayButton: false });
+  }
+
+  showAutoPlayButton = () => {
+    this.setState({ showAutoPlayButton: true });
+  }
+
   render() {
-    var classes = classNames({
+    var connectButtonClasses = classNames({
       'button': true,
       'red': !this.state.synchronized && !this.state.connecting,
       'blue': !this.state.synchronized && this.state.connecting,
       'green': this.state.synchronized && !this.state.connecting
     });
+    var autoPlayButtonClasses = classNames({
+      'button-hidden': !this.state.showAutoPlayButton,
+      'button': true,
+      'blue': true
+    });
     return (
       <div>
         <h1>LightShow Control Panel</h1>
         <div className="buttons">
-          <h3>{this.state.displayText}</h3>
-          <h3>Light Server: {this.state.lightServerConnected ? "Connected" : "Disconnected"}</h3>
-          <button className={classes} onClick={() => this.connectToAudio()}>Listen to the Music</button><br />
+          {/* <h3>{this.state.displayText}</h3> */}
+          <h3 className={this.state.activeShowName === "None" ? "red" : "blue"}>
+            Running Show: {this.state.activeShowName}
+          </h3>
+          <h3 className={this.state.syncServerConnected ? "green" : (this.state.connecting ? "blue" : "red")}>
+            Sync Server: {this.state.syncServerConnected ? "Connected" : (this.state.connecting ? "Connecting..." : "Disconnected")}
+          </h3>
+          <h3 className={this.state.synchronized ? "green" : (this.state.synchronizing ? "blue" : "red")}>
+            Synchronized: {this.state.synchronized ?
+              ("Yes (" + Math.abs(this.state.sync_server_time_offset) + "ms " + (this.state.sync_server_time_offset >= 0 ? "behind" : "ahead") + ")") :
+              (this.state.synchronizing ? "Synchronizing..." : "No")}
+          </h3>
+          <h3 className={this.state.lightServerConnected ? "green" : "red"}>
+            Light Server: {this.state.lightServerConnected ? "Online" : "Offline"}
+          </h3>
+          <button className={autoPlayButtonClasses} onClick={() => audioManager.forcePlayAudio(this.hideAutoPlayButton.bind(this))}>
+            Click to start the music!
+          </button>
+          <br style={{ display: this.state.showAutoPlayButton ? '' : 'none' }} />
+          <button className={connectButtonClasses} onClick={() => this.connectToAudio()}>Connect</button>
+          <br />
           <ShowControl startShow={this.startShow} stopShow={this.stopShow} connected={this.state.synchronized} />
         </div>
       </div>

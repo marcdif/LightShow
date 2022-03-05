@@ -28,6 +28,37 @@
   color: #61dafb;
 }
 
+h3 {
+  margin: 20px 0;
+  text-align: left;
+}
+
+h3.red {
+  color: red;
+}
+
+h3.blue {
+  color: #222;
+  animation-name: flashTextBlue;
+  animation-duration: 0.5s;
+  animation-iteration-count: infinite;
+}
+
+h3.slowBlue {
+  color: #222;
+  animation-name: flashTextBlue;
+  animation-duration: 1.5s;
+  animation-iteration-count: infinite;
+}
+
+h3.green {
+  color: #4CAF50;
+}
+
+button.button-hidden {
+  display: none;
+}
+
 .button {
   border: none;
   color: white;
@@ -41,25 +72,25 @@
   border-radius: 25px;
 }
 
-.red {
+button.red {
   background-color: red;
 }
 
-.blue {
+button.blue {
   background-color: #222;
-  animation-name: flashBlue;
+  animation-name: flashBackgroundBlue;
   animation-duration: 0.5s;
   animation-iteration-count: infinite;
 }
 
-.slowBlue {
+button.slowBlue {
   background-color: #222;
-  animation-name: flashBlue;
+  animation-name: flashBackgroundBlue;
   animation-duration: 1.5s;
   animation-iteration-count: infinite;
 }
 
-@keyframes flashBlue {
+@keyframes flashBackgroundBlue {
   0% {
     background-color: #4285f4;
   }
@@ -71,7 +102,19 @@
   }
 }
 
-.green {
+@keyframes flashTextBlue {
+  0% {
+    color: #4285f4;
+  }
+  50% {
+    color: #3064ba;
+  }
+  100% {
+    color: #4285f4;
+  }
+}
+
+button.green {
   background-color: #4CAF50;
 }
 
