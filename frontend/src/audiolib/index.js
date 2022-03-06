@@ -54,9 +54,6 @@ export default class AudioManager {
             this.audio.onended = function () {
               h.tracks.delete(songPath);
             }
-            setInterval(() => {
-              log('[Song Time] ' + this.audio.currentTime);
-            }, 1000);
           }).catch(error => {
             if (error.name === "NotAllowedError") {
               log('[DEBUG] Need to handle autoplay blocked error!');
@@ -99,9 +96,6 @@ export default class AudioManager {
       if (startPlayPromise !== undefined) {
         startPlayPromise.then(() => {
           result.call();
-          setInterval(() => {
-            log('[Song Time] ' + this.audio.currentTime);
-          }, 1000);
         }).catch(error => {
           log("[DEBUG] Even that button didn't fix it!");
         })

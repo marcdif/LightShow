@@ -246,9 +246,11 @@ class Page extends React.Component {
             Click to start the music!
           </button>
           <br style={{ display: this.state.showAutoPlayButton ? '' : 'none' }} />
-          <button className={connectButtonClasses} onClick={() => this.connectToAudio()}>Connect</button>
+          <button className={connectButtonClasses} onClick={() => this.connectToAudio()}>{this.state.syncServerConnected ? "Reconnect" : "Connect"}</button>
           <br />
-          <ShowControl startShow={this.startShow} stopShow={this.stopShow} connected={this.state.synchronized} />
+          <div style={{ display: this.state.syncServerConnected ? '' : 'none' }}>
+            <ShowControl startShow={this.startShow} stopShow={this.stopShow} connected={this.state.synchronized} />
+          </div>
         </div>
       </div>
     );
