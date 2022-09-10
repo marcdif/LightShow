@@ -5,7 +5,6 @@ import com.google.gson.JsonParser;
 import com.marcdif.ledagent.Main;
 import com.marcdif.ledagent.handlers.ConnectionType;
 import com.marcdif.ledagent.wss.packets.*;
-
 import lombok.Getter;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_6455;
@@ -133,7 +132,7 @@ public class LightWSSConnection {
                             }
                             StartShowPacket packet = new StartShowPacket(object);
 
-                            Main.getShowManager().startShow(packet.getShowName());
+                            Main.getLightManager().getShowManager().startShow(packet.getShowName());
 
 //                            showStartTime = (System.currentTimeMillis() + 2000) - syncServerTimeOffset;
 //                            showName = packet.getShowName();
@@ -151,7 +150,7 @@ public class LightWSSConnection {
                                 Main.logMessage("[ERROR] Can't stop a show, we aren't synchronized!");
                                 return;
                             }
-                            Main.getShowManager().stopShow();
+                            Main.getLightManager().getShowManager().stopShow();
 //                            if (agentThread != null && agentThread.isAlive()) {
 ////                                //noinspection deprecation
 ////                                agentThread.stop();

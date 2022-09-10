@@ -5,7 +5,6 @@ import com.marcdif.ledagent.wss.packets.StopSongPacket;
 
 public class ShowManager {
     private static final long SHOW_START_OFFSET = 2000L;
-    public static final String HOME_PATH = "/home/pi/";
     private ShowThread activeShowThread = null;
 
     private long showStartTime = 0;
@@ -38,7 +37,7 @@ public class ShowManager {
         if (activeShowThread == null && this.showName.isEmpty()) {
             Main.logMessage("[WARN] There is no active show to stop!!!");
         } else {
-            activeShowThread.forceStopShow();
+            if (activeShowThread != null) activeShowThread.forceStopShow();
             activeShowThread = null;
             this.showName = "";
             this.showStartTime = 0;
