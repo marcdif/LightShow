@@ -3,20 +3,21 @@ package com.marcdif.ledagent.show.actions;
 import com.github.mbelling.ws281x.Color;
 import com.marcdif.ledagent.Main;
 import com.marcdif.ledagent.utils.ColorUtil;
-
 import lombok.Getter;
 
 public class FadeToAction extends ShowAction {
     @Getter private final Color color;
     private final double duration;
+    private final int level;
 
     private boolean firstRun = true;
     private double startTime;
     private Color starting;
     private Color delta;
 
-    public FadeToAction(double time, Color color, double duration) {
+    public FadeToAction(double time, int level, Color color, double duration) {
         super(time, ActionType.FADE_TO);
+        this.level = level;
         this.color = color;
         this.duration = duration;
     }
@@ -27,11 +28,11 @@ public class FadeToAction extends ShowAction {
         if (firstRun) {
             this.startTime = now;
             this.firstRun = false;
-            this.starting = Main.getLightStrip().getFullStripColor();
+            this.starting = Main.getStage().getLevel(level).getPixel(0);
             this.delta = ColorUtil.getColorDelta(this.color, this.starting);
         }
         double percent = (now - this.startTime) / this.duration;
-        Main.getLightStrip().setAll(ColorUtil.colorAdd(this.starting, ColorUtil.colorMult(this.delta, percent)));
+        Main.getStage().getLevel(level).setAll(ColorUtil.colorAdd(this.starting, ColorUtil.colorMult(this.delta, percent)));
         if (now - this.startTime >= this.duration) {
             this.done = true;
         }

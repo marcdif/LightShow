@@ -1,5 +1,6 @@
 package com.marcdif.ledagent;
 
+import com.marcdif.ledagent.handlers.LEDStage;
 import com.marcdif.ledagent.handlers.LightStrip;
 import com.marcdif.ledagent.show.ShowManager;
 import com.marcdif.ledagent.wss.LightWSSConnection;
@@ -32,5 +33,9 @@ public class Main {
 
     public static void sendPacket(BasePacket packet) {
         connection.send(packet);
+    }
+
+    public static LEDStage getStage() {
+        return showManager.getStage();
     }
 }

@@ -3,19 +3,21 @@ package com.marcdif.ledagent.show.actions;
 import com.github.mbelling.ws281x.Color;
 import com.marcdif.ledagent.Main;
 
-public class FullLightAction extends ShowAction {
-    private final int level;
+public class FlashAction extends ShowAction {
     private final Color finalColor;
+    private final int level, startPixel, endPixel;
 
-    public FullLightAction(double time, int level, Color color) {
+    public FlashAction(double time, int level, Color color, int startPixel, int endPixel) {
         super(time, ActionType.FULL_LIGHT);
         this.level = level;
         this.finalColor = color;
+        this.startPixel = startPixel;
+        this.endPixel = endPixel;
     }
 
     @Override
     public void run_impl() {
-        Main.getStage().getLevel(level).setAll(finalColor);
+        Main.getShowManager().getStage().getLevel(level).setPixels(finalColor, startPixel, endPixel);
         this.done = true;
     }
 

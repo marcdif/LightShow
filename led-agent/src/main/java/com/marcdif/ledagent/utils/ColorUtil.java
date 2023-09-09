@@ -59,6 +59,14 @@ public class ColorUtil {
         return new Color((int) (color.getRed() * amount), (int) (color.getGreen() * amount), (int) (color.getBlue() * amount));
     }
 
+    public static Color colorDiv(Color color, Color amount) {
+        return new Color(color.getRed() / amount.getRed(), color.getGreen() / amount.getGreen(), color.getBlue() / amount.getBlue());
+    }
+
+    public static Color colorDiv(Color color, double amount) {
+        return new Color((int) (color.getRed() / amount), (int) (color.getGreen() / amount), (int) (color.getBlue() / amount));
+    }
+
     public static Color verify(Color color) {
         if (color.getRed() >= 0 && color.getGreen() >= 0 && color.getBlue() >= 0) return color;
         Main.logMessage("[WARN] Invalid color values: " + color);

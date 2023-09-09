@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -22,12 +23,12 @@ import com.marcdif.ledagent.utils.MathUtil;
 import com.marcdif.ledagent.wss.packets.StartSongPacket;
 
 public class ShowThread extends Thread {
-    public static boolean DEBUG = false;
-    private final boolean DEBUG_VERBOSE = false;
+    public static boolean DEBUG = true;
+    private final boolean DEBUG_VERBOSE = true;
     @Getter private final String showName;
     @Getter private String showTitle = "Unknown";
     private final long startTime;
-    @Getter LEDStage ledStage = new LEDStage(0, 1, 2, 3, 4);
+    @Getter LEDStage ledStage = new LEDStage(0, 10, 20, 30, 40);
 
     private ShowAction firstAction, nextAction = null;
     private List<ShowAction> runningActions = null;
@@ -64,6 +65,9 @@ public class ShowThread extends Thread {
 
             String first = tokens[0];
 
+            if (DEBUG_VERBOSE) Main.logMessage("LINE '" + line + "'");
+            if (DEBUG_VERBOSE) Main.logMessage("Breakpoint 1 " + Arrays.toString(tokens));
+
             if (first.startsWith("#")) {
                 continue;
             } else if (first.equals("Show")) {
@@ -96,10 +100,10 @@ public class ShowThread extends Thread {
                     forLoop = new ForAction(t, Integer.parseInt(tokens[2]), Double.parseDouble(tokens[3]));
                     break;
                 case "FullLight":
-                    nextAction = new FullLightAction(t, ColorUtil.getColor(tokens[2]));
+                    nextAction = new FullLightAction(t, Integer.parseInt(tokens[2]), ColorUtil.getColor(tokens[3]));
                     break;
                 case "FadeTo":
-                    nextAction = new FadeToAction(t, ColorUtil.getColor(tokens[2]), Double.parseDouble(tokens[3]));
+                    nextAction = new FadeToAction(t, Integer.parseInt(tokens[2]), ColorUtil.getColor(tokens[3]), Double.parseDouble(tokens[4]));
                     break;
                 }
             } else if (first.equals("}")) {
@@ -113,6 +117,7 @@ public class ShowThread extends Thread {
             }
 
             if (nextAction != null || (forLoop != null && forLoopFirstAction == null)) {
+                if (DEBUG_VERBOSE) Main.logMessage("Breakpoint 2 " + (nextAction == null ? "" : nextAction.getClass().getName()));
                 ShowAction relativeFirstAction;
                 if (forLoop != null) {
                     relativeFirstAction = forLoopFirstAction;
@@ -163,7 +168,7 @@ public class ShowThread extends Thread {
             Main.logMessage("Finished loading " + size + " actions...");
 
         Main.logMessage("Audio: " + showAudio);
-        String[] audio = showAudio.split(" ");
+        String[] audio = showAudio.split(",");
         String songPath = audio[0];
         int duration = Integer.parseInt(audio[1]) * 1000;
         StartSongPacket startSongPacket = new StartSongPacket(songPath, this.startTime, duration, showName);
@@ -253,70 +258,6 @@ public class ShowThread extends Thread {
                 }
                 Main.getLightStrip().render();
             }, 0, 10, TimeUnit.MILLISECONDS); // 100 times per second
-
-            // while (true) {
-            // long currentTime = System.currentTimeMillis();
-            // long nextRun = (long) (startTime + ((count + 1) * 0.01));
-            // // Only run every 0.01 seconds (100 times per second)
-            // if (currentTime < nextRun) {
-            // if (DEBUG_VERBOSE) Main.logMessage("Sleep for " + ((lastRun + 0.01) -
-            // System.currentTimeMillis()));
-            // sleep(nextRun - System.currentTimeMillis());
-            // continue;
-            // }
-            //
-            // lastRun = currentTime;
-            // count++;
-            //
-            // // Calculate number of seconds we are into the show
-            // long timeDiff = currentTime - startTime;
-            //
-            // // Array for storing any actions that are done
-            // List<ShowAction> done = new ArrayList<>();
-            // // Process all running actions
-            // for (ShowAction act : runningActions) {
-            // // 1) If the action is done, add to the 'to remove' list...
-            // if (act.isDone()) {
-            // done.add(act);
-            // } else {
-            // // 2) otherwise run it.
-            // // Note: Actions are responsible for tracking the interval they're supposed
-            // to run at.
-            // // act.run() could be called 100 times per second.
-            // // If the action is only meant to run 10 times per second, it should have a
-            // counter variable.
-            // act.run();
-            // if (act.isDone()) done.add(act);
-            // }
-            // }
-            //
-            // // Remove all done actions from runningActions
-            // for (ShowAction act : done) {
-            // runningActions.remove(act);
-            // }
-            // done.clear();
-            //
-            // if (nextAction == null) {
-            // // Stop show if there are no actions left
-            // if (runningActions.isEmpty()) {
-            // break;
-            // } else {
-            // continue;
-            // }
-            // }
-            //
-            // // 1) If it's time for the next action to start...
-            // while (nextAction != null && timeDiff >= nextAction.getTime()) {
-            // // 2) add it to the list of RunningActions...
-            // runningActions.add(nextAction);
-            // // 3) and run it for the first time...
-            // nextAction.run();
-            // // 4) and update nextaction to the next action.
-            // nextAction = nextAction.getNextAction();
-            // // 5) Continue looping until the next action shouldn't start yet.
-            // continue;
-            // }
-            // }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -327,6 +268,6 @@ public class ShowThread extends Thread {
         nextAction = null;
         if (runningActions != null)
             runningActions.clear();
-        Main.getLightStrip().clear();
+        ledStage.clear();
     }
 }

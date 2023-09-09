@@ -1,6 +1,7 @@
 Show	Name	Happily Ever After
-Show	Audio	hea.mp3 1105
+Show	Audio	hea.mp3,1105
 Show	Time	Seconds
+Show	Debug	true
 # Show	SetStage	c1,c2,c3,c4,last	(clockwise)
 Show	SetStage	16,33,62,78,107
 
@@ -9,14 +10,14 @@ Show	SetStage	16,33,62,78,107
 # 0.6	FullLight	0,0,255
 # 0.9	FullLight	255,0,0
 
-1.4	FullLight	255,255,255
-1.5	FadeTo	0,0,0	1.25
+1.4	FullLight	0	255,255,255
+1.5	FadeTo	0	0,0,0	1.25
 #1.5	FullLight	200,200,200
 #1.6	FullLight	170,170,170
 #1.7	FullLight	130,130,130
 #1.8	FullLight	90,90,90
 #1.9	FullLight	40,40,40
 #2	FullLight	0,0,0
-3.2	FullLight	0,255,0
-3.21	FadeTo	0,0,0	1.24
-33.21	FadeTo	0,0,0	1.24
+3.2	FullLight	0	0,255,0
+3.21	FadeTo	0	0,0,0	1.24
+33.21	FadeTo	0	0,0,0	1.24

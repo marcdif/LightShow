@@ -1,6 +1,7 @@
 package com.marcdif.ledagent.show;
 
 import com.marcdif.ledagent.Main;
+import com.marcdif.ledagent.handlers.LEDStage;
 import com.marcdif.ledagent.wss.packets.StopSongPacket;
 
 public class ShowManager {
@@ -35,7 +36,7 @@ public class ShowManager {
 
     public void stopShow() {
         Main.logMessage("[INFO] Received request to stop the active show!");
-        if (activeShowThread == null && this.showName.isEmpty()) {
+        if (activeShowThread == null || this.showName.isEmpty()) {
             Main.logMessage("[WARN] There is no active show to stop!!!");
         } else {
             activeShowThread.forceStopShow();
@@ -45,5 +46,10 @@ public class ShowManager {
             Main.logMessage("[INFO] Show has ended, sending out StopSongPacket");
             Main.sendPacket(new StopSongPacket());
         }
+    }
+
+    public LEDStage getStage() {
+        if (activeShowThread == null) return null;
+        return activeShowThread.getLedStage();
     }
 }
